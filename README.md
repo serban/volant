@@ -1,1 +1,1 @@
-# vs — Volant Script
+# Volant

@@ -28,7 +28,7 @@ wheels = [
 ]
 
 [[package]]
-name = "vs"
+name = "volant"
 version = "0.0.1"
 source = { editable = "." }
 

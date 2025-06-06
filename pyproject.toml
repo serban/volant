@@ -1,5 +1,5 @@
 [project]
-name = "vs"
+name = "volant"
 version = "0.0.1"
 description = "Volant Script"
 readme = "README.md"

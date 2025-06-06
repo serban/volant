@@ -2,16 +2,16 @@ import contextlib
 import io
 import unittest
 
-import vs
+import volant
 
 kSeparator = '  ────────────────────────────────────────────────────────────────────────────  \n'
 
 
-class VsTest(unittest.TestCase):
+class VolantTest(unittest.TestCase):
   maxDiff = None
 
   def test_separator(self):
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
-        vs.separator()
+        volant.separator()
       self.assertEqual(kSeparator, buffer.getvalue())
