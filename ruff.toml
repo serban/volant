@@ -1,0 +1,12 @@
+output-format = 'grouped'
+
+indent-width = 2
+line-length = 80
+
+[format]
+quote-style = 'single'
+
+[lint]
+ignore = [
+  'E741', # https://docs.astral.sh/ruff/rules/ambiguous-variable-name
+]
