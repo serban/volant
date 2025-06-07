@@ -11,3 +11,6 @@ format:
 
 precommit: check test
   uv run ruff format --check
+
+doc:
+  uv run pdoc --docformat google volant
