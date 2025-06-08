@@ -17,6 +17,7 @@ changelog = "https://github.com/serban/volant/blob/master/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
+  "coverage>=7.8.2",
   "pdoc>=15.0.4",
   "ruff>=0.11.13",
 ]
