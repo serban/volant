@@ -5,6 +5,10 @@ test:
 
 check:
   uv run ruff check
+  uv run ty check
+  uv run pyrefly check
+  uv run basedpyright
+  uv run mypy --check-untyped-defs .
 
 coverage:
   uv run coverage run

@@ -8,7 +8,7 @@ kSeparator = '  ─────────────────────�
 
 
 class VolantTest(unittest.TestCase):
-  maxDiff = None
+  maxDiff: int | None = None
 
   def test_separator(self):
     with io.StringIO() as buffer:
