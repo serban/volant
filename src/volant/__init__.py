@@ -7,6 +7,11 @@ def clip(s: str) -> None:
   print(f'\033]52;c;{payload}\007', end='', flush=True)
 
 
+def title(s: str) -> None:
+  """Set the terminal title."""
+  print(f'\033]0;{s}\007', end='', flush=True)
+
+
 def separator() -> None:
   """Print a nice horizontal line."""
   print(f'  {"─" * 76}  ')
