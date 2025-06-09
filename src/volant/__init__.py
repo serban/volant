@@ -1,3 +1,12 @@
+import base64
+
+
+def clip(s: str) -> None:
+  """Write a string to the clipboard via the OSC 52 terminal escape sequence."""
+  payload = base64.b64encode(s.encode()).decode()
+  print(f'\033]52;c;{payload}\007', end='', flush=True)
+
+
 def separator() -> None:
   """Print a nice horizontal line."""
   print(f'  {"─" * 76}  ')

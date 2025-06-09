@@ -22,6 +22,12 @@ kHeadingLong = """
 class VolantTest(unittest.TestCase):
   maxDiff: int | None = None
 
+  def test_clip(self):
+    with io.StringIO() as buffer:
+      with contextlib.redirect_stdout(buffer):
+        volant.clip('Aparecium!')
+      self.assertEqual('\033]52;c;QXBhcmVjaXVtIQ==\007', buffer.getvalue())
+
   def test_separator(self):
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
