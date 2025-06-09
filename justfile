@@ -26,3 +26,12 @@ precommit: check test
 
 doc:
   uv run pdoc --docformat google volant
+
+upgrade:
+  git diff --exit-code
+  git diff --exit-code --staged
+  uv tree --outdated
+  uv remove --dev basedpyright coverage mypy pdoc pyrefly ruff ty
+  uv    add --dev basedpyright coverage mypy pdoc pyrefly ruff ty
+  git add pyproject.toml uv.lock
+  date '+Bump Dependencies @ %Y-%m-%d %H:%M' | git commit --file -
