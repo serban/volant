@@ -27,6 +27,9 @@ precommit: check test
 doc:
   uv run pdoc --docformat google volant
 
+edit:
+  vim README.md CHANGELOG.md justfile src/volant/__init__.py tests/test_volant.py
+
 upgrade:
   git diff --exit-code
   git diff --exit-code --staged
