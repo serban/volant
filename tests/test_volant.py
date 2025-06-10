@@ -1,6 +1,9 @@
 import contextlib
 import io
+import os
+import pathlib
 import unittest
+import unittest.mock
 
 import volant
 
@@ -19,8 +22,31 @@ kHeadingLong = """
 """.lstrip()
 
 
+# https://github.com/python/typeshed/blob/main/stdlib/_typeshed/__init__.pyi
+type StrPath = str | os.PathLike[str]
+
+
 class VolantTest(unittest.TestCase):
   maxDiff: int | None = None
+
+  def test_tilde(self):
+    # fmt: off
+    subs: list[tuple[str, StrPath]] = [
+      ('/oso/de/peluche', '/oso/de/peluche'),
+      ('~/oso/cachorro',  '/home/oski/oso/cachorro'),
+      ('/',               pathlib.PurePath('/')),
+      ('/bruin',          pathlib.PurePath('/bruin')),
+      ('/den/home/oski',  pathlib.PurePath('/den/home/oski')),
+      ('~',               pathlib.PurePath('/home/oski')),
+      ('~/bear',          pathlib.PurePath('/home/oski/bear')),
+      ('~/home/oski',     pathlib.PurePath('/home/oski/home/oski')),
+      ('~/cub/home/oski', pathlib.PurePath('/home/oski/cub/home/oski')),
+    ]
+    # fmt: on
+    with unittest.mock.patch.dict(os.environ, {'HOME': '/home/oski'}):
+      for out, arg in subs:
+        with self.subTest(arg):
+          self.assertEqual(out, volant.tilde(arg))
 
   def test_clip(self):
     with io.StringIO() as buffer:

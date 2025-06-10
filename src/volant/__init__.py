@@ -1,4 +1,12 @@
 import base64
+import os
+import pathlib
+
+
+def tilde(p: str | os.PathLike[str]) -> str:
+  """Replace the $HOME prefix of a path with '~'. Returns a string."""
+  path, home = os.fsdecode(p), str(pathlib.Path.home())
+  return path.replace(home, '~', 1) if path.startswith(home) else path
 
 
 def clip(s: str) -> None:
