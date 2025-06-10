@@ -33,6 +33,9 @@ edit:
 repl:
   uv run python -ic 'import volant; from volant import *'
 
+watch:
+  watchexec --quiet --clear --shell none --exts py,toml --filter justfile --filter uv.lock -- just iterate
+
 upgrade:
   git diff --exit-code
   git diff --exit-code --staged
