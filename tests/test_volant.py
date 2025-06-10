@@ -62,6 +62,53 @@ class VolantTest(unittest.TestCase):
         '\033]0;They call me Mister Tibbs!\007', buffer.getvalue()
       )
 
+  def test_debug(self):
+    with io.StringIO() as buffer:
+      with contextlib.redirect_stdout(buffer):
+        volant.debug('An elephant never forgets.')
+      self.assertEqual(
+        '\033[34m% An elephant never forgets. \033[0m\n', buffer.getvalue()
+      )
+
+  def test_message(self):
+    with io.StringIO() as buffer:
+      with contextlib.redirect_stdout(buffer):
+        volant.message('The sleeping fox catches no poultry.')
+      self.assertEqual(
+        '\033[36m❋ The sleeping fox catches no poultry. \033[0m\n',
+        buffer.getvalue(),
+      )
+
+  def test_success(self):
+    with io.StringIO() as buffer:
+      with contextlib.redirect_stdout(buffer):
+        volant.success('From downtown!')
+      self.assertEqual('\033[32m✓ From downtown! \033[0m\n', buffer.getvalue())
+
+  def test_result(self):
+    with io.StringIO() as buffer:
+      with contextlib.redirect_stdout(buffer):
+        volant.result('Upgrade complete.')
+      self.assertEqual(
+        '\033[35m→ Upgrade complete. \033[0m\n', buffer.getvalue()
+      )
+
+  def test_error(self):
+    with io.StringIO() as buffer:
+      with contextlib.redirect_stdout(buffer):
+        volant.error('Dave, my mind is going.')
+      self.assertEqual(
+        '\033[31m! Dave, my mind is going. \033[0m\n', buffer.getvalue()
+      )
+
+  def test_die(self):
+    with io.StringIO() as buffer:
+      with contextlib.redirect_stdout(buffer):
+        with self.assertRaises(SystemExit) as context:
+          volant.die('He blew a fuse.')
+        self.assertEqual(1, context.exception.code)
+      self.assertEqual('\033[31m! He blew a fuse. \033[0m\n', buffer.getvalue())
+
   def test_separator(self):
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
