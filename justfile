@@ -30,6 +30,9 @@ doc:
 edit:
   vim README.md CHANGELOG.md justfile src/volant/__init__.py tests/test_volant.py
 
+repl:
+  uv run python -ic 'import volant; from volant import *'
+
 upgrade:
   git diff --exit-code
   git diff --exit-code --staged
