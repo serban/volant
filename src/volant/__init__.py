@@ -33,36 +33,36 @@ def title(s: str) -> None:
   print(f'\033]0;{s}\007', end='', flush=True)
 
 
-def debug(*args: object, flush: bool = False) -> None:
+def debug(*args: object) -> None:
   """Print a debug message. Does nothing if running in PYTHONOPTIMIZE mode."""
   # https://github.com/astral-sh/ty/issues/577 - __debug__ symbol not recognized
   if __debug__:  # ty: ignore[unresolved-reference]
-    print(f'{BLUE}%', *args, RESET, flush=flush)
+    print(f'{BLUE}%', *args, RESET)
 
 
-def message(*args: object, flush: bool = False) -> None:
-  """Print an info message. Takes the same arguments as built-in print()."""
-  print(f'{CYAN}❋', *args, RESET, flush=flush)
+def message(*args: object) -> None:
+  """Print an info message. Arguments are passed to built-in print()."""
+  print(f'{CYAN}❋', *args, RESET)
 
 
-def success(*args: object, flush: bool = False) -> None:
-  """Print a success message. Takes the same arguments as built-in print()."""
-  print(f'{GREEN}✓', *args, RESET, flush=flush)
+def success(*args: object) -> None:
+  """Print a success message. Arguments are passed to built-in print()."""
+  print(f'{GREEN}✓', *args, RESET)
 
 
-def result(*args: object, flush: bool = False) -> None:
-  """Print a result message. Takes the same arguments as built-in print()."""
-  print(f'{MAGENTA}→', *args, RESET, flush=flush)
+def result(*args: object) -> None:
+  """Print a result message. Arguments are passed to built-in print()."""
+  print(f'{MAGENTA}→', *args, RESET)
 
 
-def error(*args: object, flush: bool = False) -> None:
-  """Print an error message. Takes the same arguments as built-in print()."""
-  print(f'{RED}!', *args, RESET, flush=flush)
+def error(*args: object) -> None:
+  """Print an error message. Arguments are passed to built-in print()."""
+  print(f'{RED}!', *args, RESET)
 
 
-def die(*args: object, flush: bool = False) -> None:
+def die(*args: object) -> None:
   """Print an error message and die with exit status 1. Same args as print()."""
-  error(*args, flush=flush)
+  error(*args)
   sys.exit(1)
 
 
