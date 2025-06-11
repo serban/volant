@@ -1,0 +1,13 @@
+{
+  "auto_install_extension": {
+    "ruff": true
+  },
+  "languages": {
+    "Python": {
+      "language_servers": ["ruff"],
+      "formatter": [{ "language_server": { "name": "ruff" } }],
+      "enable_language_server": true,
+      "format_on_save": "on"
+    }
+  }
+}
