@@ -8,7 +8,7 @@ check:
   uv run ty check
   uv run pyrefly check
   uv run basedpyright
-  uv run mypy --check-untyped-defs .
+  uv run mypy
 
 coverage:
   uv run coverage run
@@ -34,7 +34,7 @@ repl:
   uv run python -ic 'import volant; from volant import *'
 
 watch:
-  watchexec --quiet --clear --shell none --exts py,toml --filter justfile --filter uv.lock -- just iterate
+  watchexec --quiet --clear --shell none --exts py,ini,toml --filter justfile --filter uv.lock -- just iterate
 
 upgrade:
   git diff --exit-code

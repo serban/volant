@@ -29,7 +29,7 @@ type StrPath = str | os.PathLike[str]
 class VolantTest(unittest.TestCase):
   maxDiff: int | None = None
 
-  def test_tilde(self):
+  def test_tilde(self) -> None:
     # fmt: off
     subs: list[tuple[str, StrPath]] = [
       ('/oso/de/peluche', '/oso/de/peluche'),
@@ -48,13 +48,13 @@ class VolantTest(unittest.TestCase):
         with self.subTest(arg):
           self.assertEqual(out, volant.tilde(arg))
 
-  def test_clip(self):
+  def test_clip(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
         volant.clip('Aparecium!')
       self.assertEqual('\033]52;c;QXBhcmVjaXVtIQ==\007', buffer.getvalue())
 
-  def test_title(self):
+  def test_title(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
         volant.title('They call me Mister Tibbs!')
@@ -62,7 +62,7 @@ class VolantTest(unittest.TestCase):
         '\033]0;They call me Mister Tibbs!\007', buffer.getvalue()
       )
 
-  def test_debug(self):
+  def test_debug(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
         volant.debug('An elephant never forgets.')
@@ -70,7 +70,7 @@ class VolantTest(unittest.TestCase):
         '\033[34m% An elephant never forgets. \033[0m\n', buffer.getvalue()
       )
 
-  def test_message(self):
+  def test_message(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
         volant.message('The sleeping fox catches no poultry.')
@@ -79,13 +79,13 @@ class VolantTest(unittest.TestCase):
         buffer.getvalue(),
       )
 
-  def test_success(self):
+  def test_success(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
         volant.success('From downtown!')
       self.assertEqual('\033[32m✓ From downtown! \033[0m\n', buffer.getvalue())
 
-  def test_result(self):
+  def test_result(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
         volant.result('Upgrade complete.')
@@ -93,7 +93,7 @@ class VolantTest(unittest.TestCase):
         '\033[35m→ Upgrade complete. \033[0m\n', buffer.getvalue()
       )
 
-  def test_error(self):
+  def test_error(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
         volant.error('Dave, my mind is going.')
@@ -101,7 +101,7 @@ class VolantTest(unittest.TestCase):
         '\033[31m! Dave, my mind is going. \033[0m\n', buffer.getvalue()
       )
 
-  def test_die(self):
+  def test_die(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
         with self.assertRaises(SystemExit) as context:
@@ -109,13 +109,13 @@ class VolantTest(unittest.TestCase):
         self.assertEqual(1, context.exception.code)
       self.assertEqual('\033[31m! He blew a fuse. \033[0m\n', buffer.getvalue())
 
-  def test_separator(self):
+  def test_separator(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):
         volant.separator()
       self.assertEqual(kSeparator, buffer.getvalue())
 
-  def test_heading(self):
+  def test_heading(self) -> None:
     for sub, out, arg in [
       ('extra', kHeadingShort, 'Extra! Extra! Read all about it!'),
       (
