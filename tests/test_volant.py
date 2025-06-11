@@ -118,6 +118,24 @@ class VolantTest(unittest.TestCase):
         self.assertEqual(1, context.exception.code)
       self.assertEqual('\033[31m! He blew a fuse. \033[0m\n', buffer.getvalue())
 
+  def test_indent(self) -> None:
+    for sub, out, arg in [
+      (1, '', ''),
+      (2, '\n', ' '),
+      (3, '\n', '\n'),
+      (4, '  strip\n   me\n  down\n', 'strip \n me\r\ndown\t'),
+      (5, '  Hop\n  skip\n  jump\n', 'Hop\nskip\njump'),
+      (6, '  Hop\n  skip\n  jump\n  higher\n', 'Hop\nskip\njump\nhigher\n'),
+      (7, '  Hop\n\n  skip\n\n  skip\n', 'Hop\n\nskip\n\nskip'),
+      (8, '  None\n', None),
+      (9, "  {'a': 1, 'b': 3.14, 'c': True}\n", {'a': 1, 'b': 3.14, 'c': True}),
+    ]:
+      with self.subTest(sub):
+        with io.StringIO() as buffer:
+          with contextlib.redirect_stdout(buffer):
+            volant.indent(arg)
+          self.assertEqual(out, buffer.getvalue())
+
   def test_separator(self) -> None:
     with io.StringIO() as buffer:
       with contextlib.redirect_stdout(buffer):

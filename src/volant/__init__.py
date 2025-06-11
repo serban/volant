@@ -71,6 +71,15 @@ def die(*args: object) -> None:
   sys.exit(1)
 
 
+def indent(o: object) -> None:
+  """Print an object and prefix two spaces to each non-blank line of output."""
+  for line in str(o).splitlines():
+    if l := line.rstrip():
+      print(' ', l)
+    else:
+      print()
+
+
 def separator() -> None:
   """Print a nice horizontal line."""
   print(f'  {"─" * 76}  ')
