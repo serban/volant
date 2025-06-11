@@ -29,6 +29,15 @@ type StrPath = str | os.PathLike[str]
 class VolantTest(unittest.TestCase):
   maxDiff: int | None = None
 
+  def test_mark(self) -> None:
+    for out, arg in [
+      ('∅', None),
+      ('\033[31m✗\033[0m', False),
+      ('\033[32m✓\033[0m', True),
+    ]:
+      with self.subTest(arg):
+        self.assertEqual(out, volant.mark(arg))
+
   def test_tilde(self) -> None:
     # fmt: off
     subs: list[tuple[str, StrPath]] = [

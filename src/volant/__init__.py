@@ -16,6 +16,11 @@ VIOLET  = '\033[95m'  # Solarized
 # fmt: on
 
 
+def mark(b: bool | None) -> str:
+  """Get a colored '✓', '✗', or '∅' for True, False, and None, respectively."""
+  return '∅' if b is None else (f'{GREEN}✓{RESET}' if b else f'{RED}✗{RESET}')
+
+
 def tilde(p: str | os.PathLike[str]) -> str:
   """Replace the $HOME prefix of a path with '~'. Returns a string."""
   path, home = os.fsdecode(p), str(pathlib.Path.home())
