@@ -1,4 +1,5 @@
 import base64
+import collections.abc
 import os
 import pathlib
 import pprint
@@ -84,6 +85,12 @@ def indent(o: object) -> None:
 def dump(o: object, width: int = 76) -> None:
   """Pretty-print an object and indent each non-blank line of output."""
   indent(pprint.pformat(o, width=width, underscore_numbers=True))
+
+
+def bullets(l: collections.abc.Iterable[object]) -> None:
+  """Print a bulleted list from the supplied iterable."""
+  for item in l:
+    print('  ⁃', item)
 
 
 def separator() -> None:

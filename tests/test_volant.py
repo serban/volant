@@ -181,6 +181,16 @@ class VolantTest(unittest.TestCase):
       ),
     )
 
+  def test_bullets(self) -> None:
+    for sub, out, arg in [
+      (1, '', []),
+      (2, '  ⁃ 0\n  ⁃ 1\n  ⁃ 4\n  ⁃ 9\n', (i**2 for i in range(4))),
+      (3, '  ⁃ Open\n  ⁃ Write\n  ⁃ Close\n', ['Open', 'Write', 'Close']),
+      (4, '  ⁃ /\n  ⁃ /m\n', [pathlib.PurePath('/'), pathlib.PurePath('/m')]),
+    ]:
+      with self.subTest(sub):
+        self.assertStdout(out, lambda: volant.bullets(arg))
+
   def test_separator(self) -> None:
     self.assertStdout(kSeparator, lambda: volant.separator())
 
