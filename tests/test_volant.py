@@ -1,3 +1,4 @@
+import collections.abc
 import contextlib
 import io
 import os
@@ -29,6 +30,14 @@ type StrPath = str | os.PathLike[str]
 class VolantTest(unittest.TestCase):
   maxDiff: int | None = None
 
+  def assertStdout(
+    self, expected: str, function: collections.abc.Callable[[], None]
+  ) -> None:
+    with io.StringIO() as buffer:
+      with contextlib.redirect_stdout(buffer):
+        function()
+      self.assertEqual(expected, buffer.getvalue())
+
   def test_mark(self) -> None:
     for out, arg in [
       ('∅', None),
@@ -58,57 +67,45 @@ class VolantTest(unittest.TestCase):
           self.assertEqual(out, volant.tilde(arg))
 
   def test_clip(self) -> None:
-    with io.StringIO() as buffer:
-      with contextlib.redirect_stdout(buffer):
-        volant.clip('Aparecium!')
-      self.assertEqual('\033]52;c;QXBhcmVjaXVtIQ==\007', buffer.getvalue())
+    self.assertStdout(
+      '\033]52;c;QXBhcmVjaXVtIQ==\007', lambda: volant.clip('Aparecium!')
+    )
 
   def test_title(self) -> None:
-    with io.StringIO() as buffer:
-      with contextlib.redirect_stdout(buffer):
-        volant.title('They call me Mister Tibbs!')
-      self.assertEqual(
-        '\033]0;They call me Mister Tibbs!\007', buffer.getvalue()
-      )
+    self.assertStdout(
+      '\033]0;They call me Mister Tibbs!\007',
+      lambda: volant.title('They call me Mister Tibbs!'),
+    )
 
   def test_debug(self) -> None:
-    with io.StringIO() as buffer:
-      with contextlib.redirect_stdout(buffer):
-        volant.debug('An elephant never forgets.')
-      self.assertEqual(
-        '\033[34m% An elephant never forgets. \033[0m\n', buffer.getvalue()
-      )
+    self.assertStdout(
+      '\033[34m% An elephant never forgets. \033[0m\n',
+      lambda: volant.debug('An elephant never forgets.'),
+    )
 
   def test_message(self) -> None:
-    with io.StringIO() as buffer:
-      with contextlib.redirect_stdout(buffer):
-        volant.message('The sleeping fox catches no poultry.')
-      self.assertEqual(
-        '\033[36m❋ The sleeping fox catches no poultry. \033[0m\n',
-        buffer.getvalue(),
-      )
+    self.assertStdout(
+      '\033[36m❋ The sleeping fox catches no poultry. \033[0m\n',
+      lambda: volant.message('The sleeping fox catches no poultry.'),
+    )
 
   def test_success(self) -> None:
-    with io.StringIO() as buffer:
-      with contextlib.redirect_stdout(buffer):
-        volant.success('From downtown!')
-      self.assertEqual('\033[32m✓ From downtown! \033[0m\n', buffer.getvalue())
+    self.assertStdout(
+      '\033[32m✓ From downtown! \033[0m\n',
+      lambda: volant.success('From downtown!'),
+    )
 
   def test_result(self) -> None:
-    with io.StringIO() as buffer:
-      with contextlib.redirect_stdout(buffer):
-        volant.result('Upgrade complete.')
-      self.assertEqual(
-        '\033[35m→ Upgrade complete. \033[0m\n', buffer.getvalue()
-      )
+    self.assertStdout(
+      '\033[35m→ Upgrade complete. \033[0m\n',
+      lambda: volant.result('Upgrade complete.'),
+    )
 
   def test_error(self) -> None:
-    with io.StringIO() as buffer:
-      with contextlib.redirect_stdout(buffer):
-        volant.error('Dave, my mind is going.')
-      self.assertEqual(
-        '\033[31m! Dave, my mind is going. \033[0m\n', buffer.getvalue()
-      )
+    self.assertStdout(
+      '\033[31m! Dave, my mind is going. \033[0m\n',
+      lambda: volant.error('Dave, my mind is going.'),
+    )
 
   def test_die(self) -> None:
     with io.StringIO() as buffer:
@@ -131,28 +128,21 @@ class VolantTest(unittest.TestCase):
       (9, "  {'a': 1, 'b': 3.14, 'c': True}\n", {'a': 1, 'b': 3.14, 'c': True}),
     ]:
       with self.subTest(sub):
-        with io.StringIO() as buffer:
-          with contextlib.redirect_stdout(buffer):
-            volant.indent(arg)
-          self.assertEqual(out, buffer.getvalue())
+        self.assertStdout(out, lambda: volant.indent(arg))
 
   def test_separator(self) -> None:
-    with io.StringIO() as buffer:
-      with contextlib.redirect_stdout(buffer):
-        volant.separator()
-      self.assertEqual(kSeparator, buffer.getvalue())
+    self.assertStdout(kSeparator, lambda: volant.separator())
 
   def test_heading(self) -> None:
-    for sub, out, arg in [
-      ('extra', kHeadingShort, 'Extra! Extra! Read all about it!'),
-      (
-        'lorem',
-        kHeadingLong,
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    self.assertStdout(
+      kHeadingShort, lambda: volant.heading('Extra! Extra! Read all about it!')
+    )
+    self.assertStdout(
+      kHeadingLong,
+      lambda: volant.heading(
+        (
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do '
+          'eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+        )
       ),
-    ]:
-      with self.subTest(sub):
-        with io.StringIO() as buffer:
-          with contextlib.redirect_stdout(buffer):
-            volant.heading(arg)
-          self.assertEqual(out, buffer.getvalue())
+    )
