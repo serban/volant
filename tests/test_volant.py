@@ -1,12 +1,43 @@
 import collections.abc
 import contextlib
 import io
+import itertools
 import os
 import pathlib
 import unittest
 import unittest.mock
 
 import volant
+
+kDump = """
+  {'a': False,
+   'b': 1_502_990_100,
+   'c': ['critter', 'fritter', 'glitter', 'jitter', 'litter', 'twitter'],
+   'd': 'aaa aab aac aba abb abc aca acb acc baa bab bac bba bbb bbc bca bcb '
+        'bcc caa cab cac cba cbb cbc cca ccb ccc',
+   'e': 2.718,
+   'f': {'g': {'j': 'aa ab ac ad ae ba bb bc bd be ca cb cc cd ce da db dc '
+                    'dd de ea eb ec ed ee',
+               'k': 'aa ab ac ad ae ba bb bc bd be ca cb cc cd ce da db dc '
+                    'dd de ea eb ec ed ee',
+               'l': 'aa ab ac ad ae ba bb bc bd be ca cb cc cd ce da db dc '
+                    'dd de ea eb ec ed ee'},
+         'h': {'j': 'aa ab ac ad ae ba bb bc bd be ca cb cc cd ce da db dc '
+                    'dd de ea eb ec ed ee',
+               'k': 'aa ab ac ad ae ba bb bc bd be ca cb cc cd ce da db dc '
+                    'dd de ea eb ec ed ee',
+               'l': 'aa ab ac ad ae ba bb bc bd be ca cb cc cd ce da db dc '
+                    'dd de ea eb ec ed ee'},
+         'i': {'j': 'aa ab ac ad ae ba bb bc bd be ca cb cc cd ce da db dc '
+                    'dd de ea eb ec ed ee',
+               'k': 'aa ab ac ad ae ba bb bc bd be ca cb cc cd ce da db dc '
+                    'dd de ea eb ec ed ee',
+               'l': 'aa ab ac ad ae ba bb bc bd be ca cb cc cd ce da db dc '
+                    'dd de ea eb ec ed ee'}},
+   'x': 1,
+   'y': 2,
+   'z': 3}
+""".lstrip('\n')
 
 kSeparator = '  ────────────────────────────────────────────────────────────────────────────  \n'
 
@@ -129,6 +160,26 @@ class VolantTest(unittest.TestCase):
     ]:
       with self.subTest(sub):
         self.assertStdout(out, lambda: volant.indent(arg))
+
+  def test_dump(self) -> None:
+    leaf = ' '.join(''.join(t) for t in itertools.product('abcde', repeat=2))
+    branch = {'l': leaf, 'k': leaf, 'j': leaf}
+    self.assertStdout(
+      kDump,
+      lambda: volant.dump(
+        {
+          'z': 3,
+          'y': 2,
+          'x': 1,
+          'a': False,
+          'b': 1502990100,
+          'c': ['critter', 'fritter', 'glitter', 'jitter', 'litter', 'twitter'],
+          'd': ' '.join(''.join(t) for t in itertools.product('abc', repeat=3)),
+          'e': 2.718,
+          'f': {'i': branch, 'h': branch, 'g': branch},
+        }
+      ),
+    )
 
   def test_separator(self) -> None:
     self.assertStdout(kSeparator, lambda: volant.separator())

@@ -1,6 +1,7 @@
 import base64
 import os
 import pathlib
+import pprint
 import sys
 
 # fmt: off
@@ -78,6 +79,11 @@ def indent(o: object) -> None:
       print(' ', l)
     else:
       print()
+
+
+def dump(o: object, width: int = 76) -> None:
+  """Pretty-print an object and indent each non-blank line of output."""
+  indent(pprint.pformat(o, width=width, underscore_numbers=True))
 
 
 def separator() -> None:
