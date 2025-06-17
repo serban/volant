@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright © 2025 Serban Giuroiu <giuroiu@gmail.com>
+# SPDX-License-Identifier: MIT
+
 import collections.abc
 import contextlib
 import io

@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: Copyright © 2025 Serban Giuroiu <giuroiu@gmail.com>
+# SPDX-License-Identifier: MIT
+
+version = 1
+
+[[annotations]]
+SPDX-FileCopyrightText = 'Copyright © 2025 Serban Giuroiu <giuroiu@gmail.com>'
+SPDX-License-Identifier = 'MIT'
+path = [
+  '.python-version',
+  'uv.lock',
+]

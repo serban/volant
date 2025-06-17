@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright © 2025 Serban Giuroiu <giuroiu@gmail.com>
+# SPDX-License-Identifier: MIT
+
 iterate: test check
 
 test:
@@ -21,6 +24,7 @@ format:
   uv run ruff format
 
 precommit: check test
+  uv run reuse lint --lines
   uv run ruff format --check
   uv run coverage run
   uv run coverage report --skip-covered --fail-under 100
@@ -41,7 +45,7 @@ upgrade:
   git diff --exit-code
   git diff --exit-code --staged
   uv tree --outdated
-  uv remove --dev basedpyright coverage mypy pdoc pyrefly ruff ty
-  uv    add --dev basedpyright coverage mypy pdoc pyrefly ruff ty
+  uv remove --dev basedpyright coverage mypy pdoc pyrefly reuse ruff ty
+  uv    add --dev basedpyright coverage mypy pdoc pyrefly reuse ruff ty
   git add pyproject.toml uv.lock
   date '+Bump Dependencies @ %Y-%m-%d %H:%M' | git commit --file -
