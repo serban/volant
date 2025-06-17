@@ -45,8 +45,7 @@ def title(s: str) -> None:
 
 def debug(*args: object) -> None:
   """Print a debug message. Does nothing if running in PYTHONOPTIMIZE mode."""
-  # https://github.com/astral-sh/ty/issues/577 - __debug__ symbol not recognized
-  if __debug__:  # ty: ignore[unresolved-reference]
+  if __debug__:
     print(f'{BLUE}%', *args, RESET)
 
 
