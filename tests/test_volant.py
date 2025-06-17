@@ -39,6 +39,13 @@ kDump = """
    'z': 3}
 """.lstrip('\n')
 
+kMap = """
+     a : True
+    bb : 1
+   ccc : two
+  dddd : [3.0, {'x': 4, 'y': 5.0, 'z': 'six'}]
+""".lstrip('\n')
+
 kSeparator = '  ────────────────────────────────────────────────────────────────────────────  \n'
 
 kHeadingShort = """
@@ -190,6 +197,26 @@ class VolantTest(unittest.TestCase):
     ]:
       with self.subTest(sub):
         self.assertStdout(out, lambda: volant.bullets(arg))
+
+  def test_map(self) -> None:
+    subs: list[tuple[int, str, dict[object, object]]] = [
+      (1, '', {}),
+      (2, '  0 : 0\n  1 : 1\n  2 : 4\n', {i: i**2 for i in range(3)}),
+      (3, '  / : /dev\n', {pathlib.PurePath('/'): pathlib.PurePath('/dev')}),
+      (
+        4,
+        kMap,
+        {
+          'a': True,
+          'bb': 1,
+          'ccc': 'two',
+          'dddd': [3.0, {'x': 4, 'y': 5.0, 'z': 'six'}],
+        },
+      ),
+    ]
+    for sub, out, arg in subs:
+      with self.subTest(sub):
+        self.assertStdout(out, lambda: volant.map(arg))
 
   def test_separator(self) -> None:
     self.assertStdout(kSeparator, lambda: volant.separator())

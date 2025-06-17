@@ -93,6 +93,13 @@ def bullets(l: collections.abc.Iterable[object]) -> None:
     print('  ⁃', item)
 
 
+def map(d: collections.abc.Mapping[object, object]) -> None:
+  """Print a key-value pair list from the supplied mapping."""
+  pad = max((len(str(k)) for k in d.keys()), default=0)
+  for key, val in d.items():
+    print(f'  {key!s:>{pad}} : {val}')
+
+
 def separator() -> None:
   """Print a nice horizontal line."""
   print(f'  {"─" * 76}  ')
