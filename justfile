@@ -17,6 +17,7 @@ coverage:
   uv run python -c 'import pathlib, webbrowser; webbrowser.open(pathlib.Path("htmlcov/index.html").absolute().as_uri())'
 
 format:
+  uv run ruff check --select I --fix
   uv run ruff format
 
 precommit: check test

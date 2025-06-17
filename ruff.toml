@@ -7,6 +7,9 @@ line-length = 80
 quote-style = 'single'
 
 [lint]
+extend-select = [
+  'I',    # https://docs.astral.sh/ruff/rules/#isort-i
+]
 ignore = [
   'E741', # https://docs.astral.sh/ruff/rules/ambiguous-variable-name
 ]
