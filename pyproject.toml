@@ -20,14 +20,14 @@ changelog = "https://github.com/serban/volant/blob/master/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
-  "basedpyright>=1.29.4",
-  "coverage>=7.9.1",
-  "mypy>=1.16.1",
-  "pdoc>=15.0.4",
-  "pyrefly>=0.20.1",
-  "reuse>=5.0.2",
-  "ruff>=0.12.0",
-  "ty>=0.0.1a11",
+  "basedpyright>=1.36.1",
+  "coverage>=7.13.0",
+  "mypy>=1.19.1",
+  "pdoc>=16.0.0",
+  "pyrefly>=0.46.0",
+  "reuse>=6.2.0",
+  "ruff>=0.14.10",
+  "ty>=0.0.4",
 ]
 
 [build-system]
