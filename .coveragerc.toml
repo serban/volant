@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: MIT
 
 [run]
-command_line = -m unittest
+command_line = '-m unittest'
 branch = true
-dynamic_context = test_function
+dynamic_context = 'test_function'
 
 [report]
 skip_empty = true
 
 [html]
-title = Volant Coverage
+title = 'Volant Coverage'
 show_contexts = true
