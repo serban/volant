@@ -7,6 +7,7 @@ import os
 import pathlib
 import pprint
 import sys
+import time
 
 # fmt: off
 RESET   = '\033[0m'
@@ -100,6 +101,11 @@ def map(d: collections.abc.Mapping[object, object]) -> None:
   pad = max((len(str(k)) for k in d.keys()), default=0)
   for key, val in d.items():
     print(f'  {key!s:>{pad}} : {val}')
+
+
+def timestamp() -> None:
+  """Print the current local time."""
+  print(f'  {"─" * 26}  {time.strftime("%Y-%m-%d %H:%M:%S")}  {"─" * 27}  ')
 
 
 def separator() -> None:

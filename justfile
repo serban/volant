@@ -45,7 +45,7 @@ upgrade:
   git diff --exit-code
   git diff --exit-code --staged
   uv tree --outdated
-  uv remove --dev basedpyright coverage mypy pdoc pyrefly reuse ruff ty
-  uv    add --dev basedpyright coverage mypy pdoc pyrefly reuse ruff ty
+  uv remove --dev basedpyright coverage mypy pdoc pyrefly reuse ruff time-machine ty
+  uv    add --dev basedpyright coverage mypy pdoc pyrefly reuse ruff time-machine ty
   git add pyproject.toml uv.lock
   date '+Bump Dependencies @ %Y-%m-%d %H:%M' | git commit --file -

@@ -3,12 +3,16 @@
 
 import collections.abc
 import contextlib
+import datetime
 import io
 import itertools
 import os
 import pathlib
 import unittest
 import unittest.mock
+import zoneinfo
+
+import time_machine
 
 import volant
 
@@ -48,6 +52,8 @@ kMap = """
    ccc : two
   dddd : [3.0, {'x': 4, 'y': 5.0, 'z': 'six'}]
 """.lstrip('\n')
+
+kTimestamp = '  ──────────────────────────  2025-12-25 11:34:57  ───────────────────────────  \n'
 
 kSeparator = '  ────────────────────────────────────────────────────────────────────────────  \n'
 
@@ -220,6 +226,14 @@ class VolantTest(unittest.TestCase):
     for sub, out, arg in subs:
       with self.subTest(sub):
         self.assertStdout(out, lambda: volant.map(arg))
+
+  def test_timestamp(self) -> None:
+    with time_machine.travel(
+      datetime.datetime(
+        2025, 12, 25, 11, 34, 57, tzinfo=zoneinfo.ZoneInfo('Pacific/Kiritimati')
+      )
+    ):
+      self.assertStdout(kTimestamp, lambda: volant.timestamp())
 
   def test_separator(self) -> None:
     self.assertStdout(kSeparator, lambda: volant.separator())
