@@ -94,6 +94,22 @@ class VolantTest(unittest.TestCase):
       with self.subTest(arg):
         self.assertEqual(out, volant.mark(arg))
 
+  def test_expanduser(self) -> None:
+    # fmt: off
+    subs: list[tuple[pathlib.Path, StrPath]]= [
+      (pathlib.Path('/'),                       '/'),
+      (pathlib.Path('/home/oski'),              '~'),
+      (pathlib.Path('/home/oski/~'),            '~/~'),
+      (pathlib.Path('/home/oski/bear'),         '~/bear'),
+      (pathlib.Path('/home/oski/bear/~/oski'),  '~/bear/~/oski'),
+      (pathlib.Path('/home/oski/cub'),          pathlib.PurePath('~/cub')),
+    ]
+    # fmt: on
+    with unittest.mock.patch.dict(os.environ, {'HOME': '/home/oski'}):
+      for out, arg in subs:
+        with self.subTest(arg):
+          self.assertEqual(out, volant.expanduser(arg))
+
   def test_tilde(self) -> None:
     # fmt: off
     subs: list[tuple[str, StrPath]] = [

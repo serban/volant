@@ -27,6 +27,11 @@ def mark(b: bool | None) -> str:
   return '∅' if b is None else (f'{GREEN}✓{RESET}' if b else f'{RED}✗{RESET}')
 
 
+def expanduser(p: str | os.PathLike[str]) -> pathlib.Path:
+  """Replace the '~' prefix of a path with $HOME. Returns a pathlib.Path."""
+  return pathlib.Path(p).expanduser()
+
+
 def tilde(p: str | os.PathLike[str]) -> str:
   """Replace the $HOME prefix of a path with '~'. Returns a string."""
   path, home = os.fsdecode(p), str(pathlib.Path.home())
