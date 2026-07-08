@@ -12,6 +12,7 @@ import unittest
 import unittest.mock
 import zoneinfo
 
+import pendulum
 import time_machine
 
 import volant
@@ -69,6 +70,7 @@ kHeadingLong = """
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 """.lstrip()
 
+type Duration = float | datetime.timedelta
 
 # https://github.com/python/typeshed/blob/main/stdlib/_typeshed/__init__.pyi
 type StrPath = str | os.PathLike[str]
@@ -84,6 +86,111 @@ class VolantTest(unittest.TestCase):
       with contextlib.redirect_stdout(buffer):
         function()
       self.assertEqual(expected, buffer.getvalue())
+
+  def test_get_total_seconds(self) -> None:
+    bad: list[Duration] = [
+      -1,
+      -0.001,
+      datetime.timedelta.min,
+      datetime.timedelta(microseconds=-1),
+    ]
+    for arg in bad:
+      with self.subTest(arg):
+        with self.assertRaises(ValueError):
+          volant._get_total_seconds(arg)
+
+    # fmt: off
+    subs: list[tuple[int, Duration]] = [
+      (     0, 0),
+      (     1, 1),
+      (     0, 0.0),
+      (     2, 2.718),
+      (     3, 3.142),
+      (     0, datetime.timedelta(microseconds=      1)),
+      (     0, datetime.timedelta(microseconds=999_999)),
+      (     0, datetime.timedelta(                      seconds= 0)),
+      (     1, datetime.timedelta(                      seconds= 1)),
+      (    59, datetime.timedelta(                      seconds=59)),
+      (    60, datetime.timedelta(          minutes= 1            )),
+      (    61, datetime.timedelta(          minutes= 1, seconds= 1)),
+      ( 3_599, datetime.timedelta(          minutes=59, seconds=59)),
+      ( 3_600, datetime.timedelta(hours= 1                        )),
+      ( 3_601, datetime.timedelta(hours= 1, minutes= 0, seconds= 1)),
+      (86_399, datetime.timedelta(hours=23, minutes=59, seconds=59)),
+      (     0,  pendulum.duration(                      seconds= 0)),
+      (86_399,  pendulum.duration(hours=23, minutes=59, seconds=59)),
+    ]
+    # fmt: on
+    for out, arg in subs:
+      with self.subTest(arg):
+        self.assertEqual(out, volant._get_total_seconds(arg))
+
+  def test_human_duration(self) -> None:
+    bad: list[Duration] = [
+      -1,
+      -0.001,
+      datetime.timedelta.min,
+      datetime.timedelta(microseconds=-1),
+    ]
+    for arg in bad:
+      with self.subTest(arg):
+        with self.assertRaises(ValueError):
+          volant.human_duration(arg)
+
+    # fmt: off
+    subs: list[tuple[str, Duration]] = [
+      (              '0s',                  0.0),
+      (              '2s',                  2.718),
+      (              '3s',                  3.142),
+      (              '0s',                  0),
+      (              '1s',                  1),
+      (             '59s',                 59),
+      (         '59m 59s',              3_599),
+      (     '23h 59m 59s',             86_399),
+      (  '6d 23h 59m 59s',            604_799),
+      ('377d 23h 59m 59s',         32_659_199),
+      (              '0s', datetime.timedelta(microseconds=      1)),
+      (              '0s', datetime.timedelta(microseconds=999_999)),
+      (              '0s', datetime.timedelta(                                         seconds= 0)),
+      (              '1s', datetime.timedelta(                                         seconds= 1)),
+      (             '59s', datetime.timedelta(                                         seconds=59)),
+      (          '1m 00s', datetime.timedelta(                             minutes= 1            )),
+      (          '1m 01s', datetime.timedelta(                             minutes= 1, seconds= 1)),
+      (         '59m 59s', datetime.timedelta(                             minutes=59, seconds=59)),
+      (      '1h 00m 00s', datetime.timedelta(                   hours= 1                        )),
+      (      '1h 00m 01s', datetime.timedelta(                   hours= 1, minutes= 0, seconds= 1)),
+      (     '23h 59m 59s', datetime.timedelta(                   hours=23, minutes=59, seconds=59)),
+      (  '1d 00h 00m 00s', datetime.timedelta(          days= 1                                  )),
+      (  '1d 00h 00m 01s', datetime.timedelta(          days= 1, hours= 0, minutes= 0, seconds= 1)),
+      (  '6d 23h 59m 59s', datetime.timedelta(          days= 6, hours=23, minutes=59, seconds=59)),
+      (  '7d 00h 00m 00s', datetime.timedelta(weeks= 1, days= 0, hours= 0, minutes= 0, seconds= 0)),
+      (  '7d 00h 00m 01s', datetime.timedelta(weeks= 1, days= 0, hours= 0, minutes= 0, seconds= 1)),
+      ( '27d 23h 59m 59s', datetime.timedelta(weeks= 3, days= 6, hours=23, minutes=59, seconds=59)),
+      ( '28d 00h 00m 00s', datetime.timedelta(weeks= 4, days= 0, hours= 0, minutes= 0, seconds= 0)),
+      ('363d 23h 59m 59s', datetime.timedelta(weeks=51, days= 6, hours=23, minutes=59, seconds=59)),
+      ('364d 00h 00m 00s', datetime.timedelta(weeks=52, days= 0, hours= 0, minutes= 0, seconds= 0)),
+      ('377d 23h 59m 59s', datetime.timedelta(weeks=53, days= 6, hours=23, minutes=59, seconds=59)),
+      (              '0s',  pendulum.duration(                                         seconds= 0)),
+      ('377d 23h 59m 59s',  pendulum.duration(weeks=53, days= 6, hours=23, minutes=59, seconds=59)),
+    ]
+    # fmt: on
+    for out, arg in subs:
+      with self.subTest(arg):
+        self.assertEqual(out, volant.human_duration(arg))
+
+    # fmt: off
+    for out, arg in [
+      (           '0s',          0),
+      (           '1s',          1),
+      (          '59s',         59),
+      (       '59m59s',      3_599),
+      (    '23h59m59s',     86_399),
+      (  '6d23h59m59s',    604_799),
+      ('377d23h59m59s', 32_659_199),
+    ]:
+    # fmt: on
+      with self.subTest(arg):
+        self.assertEqual(out, volant.human_duration(arg, compact=True))
 
   def test_mark(self) -> None:
     for out, arg in [

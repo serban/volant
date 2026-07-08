@@ -24,6 +24,7 @@ dev = [
   "coverage>=7.15.0",
   "mypy>=2.1.0",
   "pdoc>=16.0.0",
+  "pendulum>=3.2.0",
   "pyrefly>=1.1.1",
   "reuse>=6.2.0",
   "ruff>=0.15.20",

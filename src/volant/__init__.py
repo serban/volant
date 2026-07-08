@@ -3,6 +3,7 @@
 
 import base64
 import collections.abc
+import datetime
 import os
 import pathlib
 import pprint
@@ -20,6 +21,45 @@ CYAN    = '\033[36m'
 ORANGE  = '\033[91m'  # Solarized
 VIOLET  = '\033[95m'  # Solarized
 # fmt: on
+
+
+def _get_total_seconds(d: float | datetime.timedelta) -> int:
+  if (sec := d.total_seconds() if isinstance(d, datetime.timedelta) else d) < 0:
+    raise ValueError(f'Duration must be non-negative. Got {d!r}')
+
+  return int(sec)
+
+
+def human_duration(d: float | datetime.timedelta, compact: bool = False) -> str:
+  """Get a human-readable representation of a duration value.
+
+  Args:
+    d:
+      A numeric value encoding seconds or a datetime.timedelta. Must be
+      non-negative. Fractional components finer than a second are discarded.
+    compact:
+      A boolean. Produce a shorter output string.
+
+  Returns:
+    A string.
+  """
+  s = '' if compact else ' '
+  total_seconds = _get_total_seconds(d)
+
+  # fmt: off
+  days,    hours_remaining_seconds   = divmod(            total_seconds, 86_400)
+  hours,   minutes_remaining_seconds = divmod(  hours_remaining_seconds,  3_600)
+  minutes, seconds                   = divmod(minutes_remaining_seconds,     60)
+
+  if days:
+    return f'{days:d}d{s}{hours:02d}h{s}{minutes:02d}m{s}{seconds:02d}s'
+  elif hours:
+    return               f'{hours:d}h{s}{minutes:02d}m{s}{seconds:02d}s'
+  elif minutes:
+    return                              f'{minutes:d}m{s}{seconds:02d}s'
+  else:
+    return                                               f'{seconds:d}s'
+  # fmt: on
 
 
 def mark(b: bool | None) -> str:
