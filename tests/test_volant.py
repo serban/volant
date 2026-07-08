@@ -70,6 +70,45 @@ kHeadingLong = """
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 """.lstrip()
 
+kWait00Seconds = """
+\033[33m⏲ Waiting 0s \033[0m
+""".lstrip()
+
+kWait01Seconds = """
+\033[33m⏲ Waiting 1s \033[0m
+  .                                                             1s
+""".lstrip()
+
+kWait59Seconds = """
+\033[33m⏲ Waiting 59s \033[0m
+  ...........................................................   59s
+""".lstrip()
+
+kWait60Seconds = """
+\033[33m⏲ Waiting 1m 00s \033[0m
+  ............................................................  1m 00s
+""".lstrip()
+
+kWait61Seconds = """
+\033[33m⏲ Waiting 1m 01s \033[0m
+  ............................................................  1m 00s
+  .                                                             1m 01s
+""".lstrip()
+
+kWait99Seconds = """
+\033[33m⏲ Waiting 1m 39s \033[0m
+  ............................................................  1m 00s
+  .......................................                       1m 39s
+""".lstrip()
+
+kWait180SecondsInterrupted = """
+\033[33m⏲ Waiting 3m 00s \033[0m
+  ............................................................  1m 00s
+  ............................................................  2m 00s
+  ...
+\033[31m! Interrupted after 2m 03s \033[0m
+""".lstrip()
+
 type Duration = float | datetime.timedelta
 
 # https://github.com/python/typeshed/blob/main/stdlib/_typeshed/__init__.pyi
@@ -374,3 +413,46 @@ class VolantTest(unittest.TestCase):
         )
       ),
     )
+
+  def test_wait(self) -> None:
+    bad: list[Duration] = [
+      -1,
+      -0.001,
+      datetime.timedelta.min,
+      datetime.timedelta(microseconds=-1),
+    ]
+    for arg in bad:
+      with self.subTest(arg):
+        with self.assertRaises(ValueError):
+          volant.wait(arg)
+
+    # fmt: off
+    for out, arg in [
+      (kWait00Seconds,  0),
+      (kWait01Seconds,  1),
+      (kWait59Seconds, 59),
+      (kWait60Seconds, 60),
+      (kWait61Seconds, 61),
+      (kWait99Seconds, 99),
+    ]:
+    # fmt: on
+      with self.subTest(arg):
+        with io.StringIO() as buffer:
+          with contextlib.redirect_stdout(buffer):
+            with unittest.mock.patch('time.sleep') as sleep:
+              self.assertEqual(
+                datetime.timedelta(seconds=arg), volant.wait(arg)
+              )
+              self.assertEqual(out, buffer.getvalue())
+              self.assertEqual(arg, sleep.call_count)
+              sleep.assert_has_calls([unittest.mock.call(1)] * arg)
+
+    with self.subTest(180):
+      with io.StringIO() as buffer:
+        with contextlib.redirect_stdout(buffer):
+          with unittest.mock.patch('time.sleep') as sleep:
+            sleep.side_effect = [None] * 123 + [KeyboardInterrupt]
+            self.assertEqual(datetime.timedelta(seconds=123), volant.wait(180))
+            self.assertEqual(kWait180SecondsInterrupted, buffer.getvalue())
+            self.assertEqual(124, sleep.call_count)
+            sleep.assert_has_calls([unittest.mock.call(1)] * 124)

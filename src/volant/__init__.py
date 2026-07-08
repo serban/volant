@@ -167,3 +167,42 @@ def heading(s: str) -> None:
   print(f'╭─{line}─╮')
   print(f'│ {text} │')
   print(f'╰─{line}─╯')
+
+
+def wait(d: float | datetime.timedelta) -> datetime.timedelta:
+  """Wait for the given time duration with visual indication of progress.
+
+  Send SIGINT (Ctrl-C) to stop waiting before the full duration has elapsed.
+
+  Args:
+    d:
+      A numeric value encoding seconds or a datetime.timedelta. Must be
+      non-negative. Fractional components finer than a second are discarded.
+
+  Returns:
+    A datetime.timedelta representing the actual amount of time waited.
+  """
+  total_seconds = _get_total_seconds(d)
+  pad = len(human_duration(total_seconds))
+
+  print(f'{YELLOW}⏲ Waiting {human_duration(total_seconds)} {RESET}')
+
+  current_second = 0
+  for second_being_processed in range(1, total_seconds + 1):
+    if (current_second := second_being_processed % 60) == 1:
+      print('  ', end='', flush=True)
+    try:
+      time.sleep(1)
+    except KeyboardInterrupt:
+      seconds_waited = second_being_processed - 1  # time.sleep() did not finish
+      print()
+      error(f'Interrupted after {human_duration(seconds_waited)}')
+      return datetime.timedelta(seconds=seconds_waited)
+    print('.', end='', flush=True)
+    if current_second == 0:
+      print(f'  {human_duration(second_being_processed):>{pad}}')
+
+  if total_seconds > 0 and current_second > 0:
+    print(f'{" " * (60 - current_second)}  {human_duration(total_seconds)}')
+
+  return datetime.timedelta(seconds=total_seconds)
