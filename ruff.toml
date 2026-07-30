@@ -14,5 +14,6 @@ extend-select = [
   'I',    # https://docs.astral.sh/ruff/rules/#isort-i
 ]
 ignore = [
-  'E741', # https://docs.astral.sh/ruff/rules/ambiguous-variable-name
+  'E741',     # https://docs.astral.sh/ruff/rules/ambiguous-variable-name
+  'SIM117',   # https://docs.astral.sh/ruff/rules/multiple-with-statements
 ]

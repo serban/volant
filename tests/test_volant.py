@@ -4,6 +4,7 @@
 import collections.abc
 import contextlib
 import datetime
+import functools
 import io
 import itertools
 import os
@@ -317,12 +318,11 @@ class VolantTest(unittest.TestCase):
     )
 
   def test_die(self) -> None:
-    with io.StringIO() as buffer:
-      with contextlib.redirect_stdout(buffer):
-        with self.assertRaises(SystemExit) as context:
-          volant.die('He blew a fuse.')
-        self.assertEqual(1, context.exception.code)
-      self.assertEqual('\033[31m! He blew a fuse. \033[0m\n', buffer.getvalue())
+    with contextlib.redirect_stdout(io.StringIO()) as buffer:
+      with self.assertRaises(SystemExit) as context:
+        volant.die('He blew a fuse.')
+    self.assertEqual('\033[31m! He blew a fuse. \033[0m\n', buffer.getvalue())
+    self.assertEqual(1, context.exception.code)
 
   def test_indent(self) -> None:
     for sub, out, arg in [
@@ -337,7 +337,7 @@ class VolantTest(unittest.TestCase):
       (9, "  {'a': 1, 'b': 3.14, 'c': True}\n", {'a': 1, 'b': 3.14, 'c': True}),
     ]:
       with self.subTest(sub):
-        self.assertStdout(out, lambda: volant.indent(arg))
+        self.assertStdout(out, functools.partial(volant.indent, arg))
 
   def test_dump(self) -> None:
     leaf = ' '.join(''.join(t) for t in itertools.product('abcde', repeat=2))
@@ -367,7 +367,7 @@ class VolantTest(unittest.TestCase):
       (4, '  ⁃ /\n  ⁃ /m\n', [pathlib.PurePath('/'), pathlib.PurePath('/m')]),
     ]:
       with self.subTest(sub):
-        self.assertStdout(out, lambda: volant.bullets(arg))
+        self.assertStdout(out, functools.partial(volant.bullets, arg))
 
   def test_map(self) -> None:
     subs: list[tuple[int, str, dict[object, object]]] = [
@@ -387,7 +387,7 @@ class VolantTest(unittest.TestCase):
     ]
     for sub, out, arg in subs:
       with self.subTest(sub):
-        self.assertStdout(out, lambda: volant.map(arg))
+        self.assertStdout(out, functools.partial(volant.map, arg))
 
   def test_timestamp(self) -> None:
     with time_machine.travel(
@@ -407,10 +407,8 @@ class VolantTest(unittest.TestCase):
     self.assertStdout(
       kHeadingLong,
       lambda: volant.heading(
-        (
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do '
-          'eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-        )
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do '
+        'eiusmod tempor incididunt ut labore et dolore magna aliqua.'
       ),
     )
 
@@ -437,22 +435,18 @@ class VolantTest(unittest.TestCase):
     ]:
     # fmt: on
       with self.subTest(arg):
-        with io.StringIO() as buffer:
-          with contextlib.redirect_stdout(buffer):
-            with unittest.mock.patch('time.sleep') as sleep:
-              self.assertEqual(
-                datetime.timedelta(seconds=arg), volant.wait(arg)
-              )
-              self.assertEqual(out, buffer.getvalue())
-              self.assertEqual(arg, sleep.call_count)
-              sleep.assert_has_calls([unittest.mock.call(1)] * arg)
+        with contextlib.redirect_stdout(io.StringIO()) as buffer:
+          with unittest.mock.patch('time.sleep') as sleep:
+            self.assertEqual(datetime.timedelta(seconds=arg), volant.wait(arg))
+            self.assertEqual(out, buffer.getvalue())
+            self.assertEqual(arg, sleep.call_count)
+            sleep.assert_has_calls([unittest.mock.call(1)] * arg)
 
     with self.subTest(180):
-      with io.StringIO() as buffer:
-        with contextlib.redirect_stdout(buffer):
-          with unittest.mock.patch('time.sleep') as sleep:
-            sleep.side_effect = [None] * 123 + [KeyboardInterrupt]
-            self.assertEqual(datetime.timedelta(seconds=123), volant.wait(180))
-            self.assertEqual(kWait180SecondsInterrupted, buffer.getvalue())
-            self.assertEqual(124, sleep.call_count)
-            sleep.assert_has_calls([unittest.mock.call(1)] * 124)
+      with contextlib.redirect_stdout(io.StringIO()) as buffer:
+        with unittest.mock.patch('time.sleep') as sleep:
+          sleep.side_effect = [None] * 123 + [KeyboardInterrupt]
+          self.assertEqual(datetime.timedelta(seconds=123), volant.wait(180))
+          self.assertEqual(kWait180SecondsInterrupted, buffer.getvalue())
+          self.assertEqual(124, sleep.call_count)
+          sleep.assert_has_calls([unittest.mock.call(1)] * 124)
