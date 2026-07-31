@@ -30,7 +30,9 @@ def _get_total_seconds(d: float | datetime.timedelta) -> int:
   return int(sec)
 
 
-def human_duration(d: float | datetime.timedelta, compact: bool = False) -> str:
+def human_duration(
+  d: float | datetime.timedelta, *, compact: bool = False
+) -> str:
   """Get a human-readable representation of a duration value.
 
   Args:
@@ -62,7 +64,7 @@ def human_duration(d: float | datetime.timedelta, compact: bool = False) -> str:
   # fmt: on
 
 
-def mark(b: bool | None) -> str:
+def mark(b: bool | None) -> str:  # ruff: ignore[FBT001]
   """Get a colored '✓', '✗', or '∅' for True, False, and None, respectively."""
   return '∅' if b is None else (f'{GREEN}✓{RESET}' if b else f'{RED}✗{RESET}')
 
@@ -130,7 +132,7 @@ def indent(o: object) -> None:
       print()
 
 
-def dump(o: object, width: int = 76) -> None:
+def dump(o: object, *, width: int = 76) -> None:
   """Pretty-print an object and indent each non-blank line of output."""
   indent(pprint.pformat(o, width=width, underscore_numbers=True))
 

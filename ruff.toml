@@ -11,7 +11,8 @@ quote-style = 'single'
 
 [lint]
 extend-select = [
-  'I',    # https://docs.astral.sh/ruff/rules/#isort-i
+  'FBT',      # https://docs.astral.sh/ruff/rules/#flake8-boolean-trap-fbt
+  'I',        # https://docs.astral.sh/ruff/rules/#isort-i
 ]
 ignore = [
   'E741',     # https://docs.astral.sh/ruff/rules/ambiguous-variable-name
