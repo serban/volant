@@ -49,3 +49,13 @@ upgrade:
   uv    add --dev basedpyright coverage mypy pdoc pendulum pyrefly reuse ruff time-machine ty
   git add pyproject.toml uv.lock
   date '+Bump Dependencies @ %Y-%m-%d %H:%M' | git commit --file -
+
+[arg('component', pattern='major|minor|patch')]
+bump component='patch':
+  git diff --exit-code
+  git diff --exit-code --staged
+  uv version --bump {{component}}
+  git add pyproject.toml uv.lock
+  git commit --message 'Release {{shell('uv version')}}'
+  git tag --annotate --message='' v{{shell('uv version --short')}}
+  uv build
