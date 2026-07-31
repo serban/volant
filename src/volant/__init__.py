@@ -208,3 +208,37 @@ def wait(d: float | datetime.timedelta) -> datetime.timedelta:
     print(f'{" " * (60 - current_second)}  {human_duration(total_seconds)}')
 
   return datetime.timedelta(seconds=total_seconds)
+
+
+def confirm(prompt: str, *, enter: bool | None = None) -> bool:
+  """Return a yes-or-no response from the user for the given prompt.
+
+  Accepts only ‘y’ for yes and ‘n’ for no.
+
+  Args:
+    prompt:
+      The string to print before waiting for input.
+    enter:
+      A boolean. When set, pressing ENTER without ‘y’ or ‘n’ returns this value.
+
+  Returns:
+    A boolean indicating yes (True) or no (False).
+
+  Raises:
+    EOFError:
+      If the user triggers EOF (Ctrl-D) instead of answering the prompt.
+    KeyboardInterrupt:
+      If the user triggers SIGINT (Ctrl-C) instead of answering the prompt.
+  """
+  try:
+    while True:
+      print(f'{VIOLET}■ {prompt} {YELLOW}', end='', flush=True)
+      if (response := input()) in ['y', 'n']:
+        return response == 'y'
+      elif type(enter) is bool and response == '':
+        return enter
+  except (EOFError, KeyboardInterrupt):
+    print()
+    raise
+  finally:
+    print(RESET, end='')

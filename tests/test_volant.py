@@ -450,3 +450,65 @@ class VolantTest(unittest.TestCase):
           self.assertEqual(kWait180SecondsInterrupted, buffer.getvalue())
           self.assertEqual(124, sleep.call_count)
           sleep.assert_has_calls([unittest.mock.call(1)] * 124)
+
+  def test_confirm(self) -> None:
+    with contextlib.redirect_stdout(io.StringIO()) as buffer:
+      with unittest.mock.patch('builtins.input', return_value='n'):
+        self.assertFalse(volant.confirm('Is you is or is you ain’t my baby?'))
+        self.assertEqual(
+          '\033[95m■ Is you is or is you ain’t my baby? \033[33m\033[0m',
+          buffer.getvalue(),
+        )
+
+    with contextlib.redirect_stdout(io.StringIO()) as buffer:
+      with unittest.mock.patch('builtins.input', return_value='y'):
+        self.assertTrue(volant.confirm('Are you experienced?'))
+        self.assertEqual(
+          '\033[95m■ Are you experienced? \033[33m\033[0m', buffer.getvalue()
+        )
+
+    with contextlib.redirect_stdout(io.StringIO()) as buffer:
+      with unittest.mock.patch(
+        'builtins.input',
+        side_effect=['', ' ', 'y ', ' n', 'Y', 'N', 'yes', 'no', 'y'],
+      ) as mock:
+        self.assertTrue(volant.confirm('Are we there yet?'))
+        self.assertEqual(9, mock.call_count)
+        self.assertEqual(
+          '\033[95m■ Are we there yet? \033[33m'
+          '\033[95m■ Are we there yet? \033[33m'
+          '\033[95m■ Are we there yet? \033[33m'
+          '\033[95m■ Are we there yet? \033[33m'
+          '\033[95m■ Are we there yet? \033[33m'
+          '\033[95m■ Are we there yet? \033[33m'
+          '\033[95m■ Are we there yet? \033[33m'
+          '\033[95m■ Are we there yet? \033[33m'
+          '\033[95m■ Are we there yet? \033[33m\033[0m',
+          buffer.getvalue(),
+        )
+
+    with contextlib.redirect_stdout(io.StringIO()) as buffer:
+      with unittest.mock.patch('builtins.input', return_value=''):
+        self.assertFalse(volant.confirm('Should I stay?', enter=False))
+        self.assertEqual(
+          '\033[95m■ Should I stay? \033[33m\033[0m', buffer.getvalue()
+        )
+
+    with contextlib.redirect_stdout(io.StringIO()) as buffer:
+      with unittest.mock.patch('builtins.input', return_value=''):
+        self.assertTrue(volant.confirm('Should I go?', enter=True))
+        self.assertEqual(
+          '\033[95m■ Should I go? \033[33m\033[0m', buffer.getvalue()
+        )
+
+    with contextlib.redirect_stdout(io.StringIO()) as buffer:
+      with unittest.mock.patch('builtins.input', side_effect=EOFError):
+        with self.assertRaises(EOFError):
+          volant.confirm('Escape?')
+      self.assertEqual('\033[95m■ Escape? \033[33m\n\033[0m', buffer.getvalue())
+
+    with contextlib.redirect_stdout(io.StringIO()) as buffer:
+      with unittest.mock.patch('builtins.input', side_effect=KeyboardInterrupt):
+        with self.assertRaises(KeyboardInterrupt):
+          volant.confirm('Stop?')
+      self.assertEqual('\033[95m■ Stop? \033[33m\n\033[0m', buffer.getvalue())
